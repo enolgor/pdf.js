@@ -660,22 +660,26 @@ class InkEditor extends AnnotationEditor {
     const y = this.y * pageHeight;
     const width = this.width * pageWidth;
     const height = this.height * pageHeight;
-    const pdfPoint = [x + shiftX + pageX, -(pageHeight - y - shiftY - height + pageY)];
+    const pdfPoint = [0, 0];
     console.log({
       tx, ty, pageWidth, pageHeight, pageX, pageY,
       shiftX, shiftY, x, y, width, height, rotation: this.rotation,
     });
     switch (this.rotation) {
+      case 0:
+        pdfPoint[0] = x + shiftX + pageX;
+        pdfPoint[1] = -(pageHeight - y - shiftY - height + pageY);
       case 90:
-        pdfPoint[1] = pdfPoint[1] - pageWidth;
+        pdfPoint[0] = x + shiftY + pageX;
+        pdfPoint[1] = -(- y + shiftX + pageY);
         break;
       case 180:
-        pdfPoint[0] = pdfPoint[0] - pageWidth;
-        pdfPoint[1] = pdfPoint[1] - pageHeight;
+        pdfPoint[0] = x - shiftX - width + pageX + pageWidth;
+        pdfPoint[1] = -(- y + shiftY + pageY);
         break;
       case 270:
-        pdfPoint[0] = pdfPoint[0] - pageWidth;
-        pdfPoint[1] = pdfPoint[1] + pageHeight - pageWidth;
+        pdfPoint[0] = x - shiftY - height + pageX + pageWidth;
+        pdfPoint[1] = -(pageHeight - y - shiftX - width + pageY );
         break;
     }
     console.log(pdfPoint);
