@@ -650,11 +650,38 @@ class InkEditor extends AnnotationEditor {
     if (event.button !== 0 || !this.isInEditMode() || this.#disableEditing) {
       return;
     }
-    const rect = this.getRect(event.offsetX, event.offsetY, this.rotation);
+    const [tx, ty] = [event.offsetX, event.offsetY];
+    const scale = this.parentScale;
+    const [pageWidth, pageHeight] = this.pageDimensions;
+    const [pageX, pageY] = this.pageTranslation;
+    const shiftX = tx / scale;
+    const shiftY = ty / scale;
+    const x = this.x * pageWidth;
+    const y = this.y * pageHeight;
+    const width = this.width * pageWidth;
+    const height = this.height * pageHeight;
+    const pdfPoint = [x + shiftX + pageX, -(pageHeight - y - shiftY - height + pageY)];
+    console.log({
+      tx, ty, pageWidth, pageHeight, pageX, pageY,
+      shiftX, shiftY, x, y, width, height, rotation: this.rotation,
+    });
+    switch (this.rotation) {
+      case 90:
+        pdfPoint[1] = pdfPoint[1] - pageWidth;
+        break;
+      case 180:
+        pdfPoint[0] = pdfPoint[0] - pageWidth;
+        pdfPoint[1] = pdfPoint[1] - pageHeight;
+        break;
+      case 270:
+        pdfPoint[0] = pdfPoint[0] - pageWidth;
+        pdfPoint[1] = pdfPoint[1] + pageHeight - pageWidth;
+        break;
+    }
+    console.log(pdfPoint);
     document.dispatchEvent(new CustomEvent('signaturePoint', {
       detail: { 
-        canvasPoint: [event.offsetX, event.offsetY],
-        pdfPoint: [rect[0], -rect[1]],
+        pdfPoint,
         pageIndex: this.pageIndex,
       }
     }));
