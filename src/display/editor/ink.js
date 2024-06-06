@@ -650,10 +650,11 @@ class InkEditor extends AnnotationEditor {
     if (event.button !== 0 || !this.isInEditMode() || this.#disableEditing) {
       return;
     }
+    const rect = this.getRect(event.offsetX, event.offsetY, this.rotation);
     document.dispatchEvent(new CustomEvent('signaturePoint', {
       detail: { 
         canvasPoint: [event.offsetX, event.offsetY],
-        pdfPoint: InkEditor.#toPDFCoordinates([event.offsetX, event.offsetY], this.getRect(0, 0), this.rotation),
+        pdfPoint: [rect[0], -rect[1]],
         pageIndex: this.pageIndex,
       }
     }));
