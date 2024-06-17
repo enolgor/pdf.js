@@ -650,43 +650,19 @@ class InkEditor extends AnnotationEditor {
     if (event.button !== 0 || !this.isInEditMode() || this.#disableEditing) {
       return;
     }
-    const [tx, ty] = [event.offsetX, event.offsetY];
-    const scale = this.parentScale;
+    const rect = this.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const transform = this.parent.viewport.transform;
+    const pdfX = (x - transform[4]) / transform[0];
+    const pdfY = (y - transform[5]) / transform[3];
     const [pageWidth, pageHeight] = this.pageDimensions;
-    const [pageX, pageY] = this.pageTranslation;
-    const shiftX = tx / scale;
-    const shiftY = ty / scale;
-    const x = this.x * pageWidth;
-    const y = this.y * pageHeight;
-    const width = this.width * pageWidth;
-    const height = this.height * pageHeight;
-    const pdfPoint = [0, 0];
-    console.log({
-      tx, ty, pageWidth, pageHeight, pageX, pageY,
-      shiftX, shiftY, x, y, width, height, rotation: this.rotation,
-    });
-    switch (this.rotation) {
-      case 0:
-        pdfPoint[0] = x + shiftX + pageX;
-        pdfPoint[1] = -(pageHeight - y - shiftY - height + pageY);
-      case 90:
-        pdfPoint[0] = x + shiftY + pageX;
-        pdfPoint[1] = -(- y + shiftX + pageY);
-        break;
-      case 180:
-        pdfPoint[0] = x - shiftX - width + pageX + pageWidth;
-        pdfPoint[1] = -(- y + shiftY + pageY);
-        break;
-      case 270:
-        pdfPoint[0] = x - shiftY - height + pageX + pageWidth;
-        pdfPoint[1] = -(pageHeight - y - shiftX - width + pageY );
-        break;
-    }
-    console.log(pdfPoint);
     document.dispatchEvent(new CustomEvent('signaturePoint', {
-      detail: { 
-        pdfPoint,
+      detail: {
+        pdfPoint: [pdfX, pdfY],
         pageIndex: this.pageIndex,
+        pageDim: [pageWidth, pageHeight],
       }
     }));
     document.getElementById("editorInk").click();
