@@ -676,8 +676,8 @@ class InkEditor extends AnnotationEditor {
       return;
     }
     const rect = this.canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    const x = event.clientX - rect.left + 5;
+    const y = event.clientY - rect.top + 5;
 
     const transform = this.parent.viewport.transform;
     const pdfX = (x - transform[4]) / transform[0];
