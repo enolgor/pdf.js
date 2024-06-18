@@ -317,6 +317,31 @@ class InkEditor extends AnnotationEditor {
 
   /** @inheritdoc */
   onceAdded() {
+    if (!window.signatureElement) {
+      const signatureElement = document.createElement("div");
+      signatureElement.style.border = "1px solid black";
+      signatureElement.style.width = "100px";
+      signatureElement.style.height = "100px";
+      signatureElement.style.zIndex = "1000";
+      signatureElement.style.position = "absolute";
+      signatureElement.style.top = "0";
+      signatureElement.style.left = "0";
+      signatureElement.style.display = "none";
+      document.body.appendChild(signatureElement);
+      window.signatureElement = signatureElement;
+    }
+    this.canvas.addEventListener("pointermove", (event) => {
+      window.signatureElement.style.width = (window.signatureWidth * this.parent.viewport.scale) + "px";
+      window.signatureElement.style.height = (window.signatureWidth * window.signatureRel * this.parent.viewport.scale) + "px";
+      window.signatureElement.style.top = (event.clientY + 5) + "px";
+      window.signatureElement.style.left = (event.clientX + 5) + "px";
+    });
+    this.canvas.addEventListener("pointerenter", function(event) {
+      window.signatureElement.style.display = "block";
+    });
+    this.canvas.addEventListener("pointerleave", function(event) {
+      window.signatureElement.style.display = "none";
+    });
     this._isDraggable = !this.isEmpty();
   }
 
